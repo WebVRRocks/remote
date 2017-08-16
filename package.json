@@ -9,7 +9,10 @@
     "prod": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": [
+    "Matthew Claypotch <me@potch.me>",
+    "WebVR Rocks authors"
+  ],
   "license": "CC0-1.0",
   "dependencies": {
     "socketpeer": "^1.0.1"
