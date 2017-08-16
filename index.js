@@ -14,12 +14,50 @@ const peer = new SocketPeer({
   serveLibrary: true
 });
 
+let pins = {};
+
+function generatePinCode (length, unique) {
+  if (typeof length === 'undefined') {
+    length = 4;
+  }
+
+  if (typeof unique === 'undefined') {
+    unique = true;
+  }
+
+  var pinDigits = [];
+  for (var idx = 0; idx < length; idx++) {
+    pinDigits.push(Math.floor(Math.random() * 10));
+  }
+
+  var pin = pinDigits.join('');
+
+  if (unique && pin in pins) {
+    return generatePINCode();
+  }
+
+  if (typeof pins[pin] !== 'number') {
+    pins[pin] = 1;
+  } else {
+    pins[pin]++;
+  }
+  return pin;
+}
+
 httpServer.on('request', (req, res) => {
-  const p = url.parse(req.url).pathname;
-  if (p === '/') {
+  const pathname = url.parse(req.url).pathname;
+  const pathnameHasPin = /\/[0-9]+$/.test(pathname);
+  if (pathname === '/' || pathnameHasPin) {
+    if (!pathnameHasPin) {
+      res.statusCode = 302;
+      res.setHeader('Location', '/' + generatePinCode());
+      res.setHeader('Content-Length', '0');
+      res.end();
+      return;
+    }
     res.writeHead(200, {'Content-Type': 'text/html'});
     fs.createReadStream(path.join(__dirname, 'index.html')).pipe(res);
-  } else if (!p.startsWith('/socketpeer/')) {
+  } else if (!pathname.startsWith('/socketpeer/')) {
     res.writeHead(404, {'Content-Type': 'text/plain'});
     res.end('File not found');
   }

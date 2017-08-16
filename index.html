@@ -36,13 +36,13 @@
     <input placeholder="message" autofocus autocomplete="off">
     <script src="/socketpeer/socketpeer.js"></script>
     <script>
-      var code = location.search.substr(1);
-      var big = Math.pow(16,10);
+      var code = window.location.search.substr(1) || window.location.hash.substr(1) || window.location.pathname.substr(1);
+      var big = Math.pow(16, 10);
       var connected = false;
 
       if (!code) {
-        code = ((Math.random() * big |0)+ big).toString(16);
-        history.replaceState(null, null, '?' + code);
+        code = ((Math.random() * big | 0) + big).toString(16);
+        history.replaceState(null, null, '/' + code);
       }
 
       var peer = new SocketPeer({
