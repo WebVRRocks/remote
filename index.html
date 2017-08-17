@@ -3,106 +3,36 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-      * {
-        box-sizing: border-box;
-      }
-      html, body {
-        height: 100%;
-        margin: 0;
-      }
-      body {
-        padding: .5em;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-      }
-      pre {
-        flex: 1;
-        overflow: auto;
-        white-space: pre-wrap;
-      }
-      input, pre {
-        font: normal 20px monospace;
-        padding: .3em;
-      }
-    </style>
+    <meta name="theme-color" content="#111">
+    <link rel="stylesheet" href="/tachyons.min.css">
+    <title>Remote</title>
   </head>
   <body>
-    <pre>
-<strong>SocketPeer</strong> test app
-<a href="https://github.com/potch/test-socketpeer">project on GitHub</a>
-    </pre>
-    <input placeholder="message" autofocus autocomplete="off">
+    <form id="nav-form" data-form="nav" action="#" method="post">
+      <fieldset class="bw0 grid" data-grid="nav">
+        <legend class="dn">Navigate</legend>
+        <label class="db w-10">
+          <input type="radio" name="direction" value="up"> Up
+        </label>
+        <label>
+          <input type="radio" name="direction" value="right"> Right
+        </label>
+        </label>
+        <label>
+          <input type="radio" name="direction" value="down"> Down
+        </label>
+        <label>
+          <input type="radio" name="direction" value="left"> Left
+        </label>
+        <label>
+          <input type="radio" name="direction" value="select" autofocus> Select
+        </label>
+        <label>
+          <input type="radio" name="direction" value="back"> Back
+        </label>
+      </fieldset>
+    </form>
     <script src="/socketpeer/socketpeer.js"></script>
-    <script>
-      var code = window.location.search.substr(1) || window.location.hash.substr(1) || window.location.pathname.substr(1);
-      var big = Math.pow(16, 10);
-      var connected = false;
-
-      if (!code) {
-        code = ((Math.random() * big | 0) + big).toString(16);
-        history.replaceState(null, null, '/' + code);
-      }
-
-      var peer = new SocketPeer({
-        pairCode: code,
-        url: location.origin + '/socketpeer/'
-      });
-
-      function pad(n) {
-        return ('0' + n).substr(-2);
-      }
-
-      var out = document.querySelector('pre');
-      function write(msg) {
-        var d = new Date();
-        var stamp = [d.getHours(), d.getMinutes(), d.getSeconds()].map(pad).join(':');
-        var row = document.createElement('div');
-        row.appendChild(document.createTextNode('[' + stamp + '] ' + msg))
-        out.appendChild(row);
-        out.scrollTop = out.scrollHeight;
-      }
-
-      var input = document.querySelector('input');
-      input.addEventListener('keypress', function (e) {
-        if (e.keyCode === 13 && connected) {
-          e.preventDefault();
-          write('<you> ' + input.value);
-          peer.send(input.value);
-          input.value = '';
-          input.focus();
-        }
-      });
-
-      peer.on('data', function (data) {
-        write('<them> ' + data);
-      });
-
-      peer.on('upgrade', function() {
-        write('upgraded to p2p');
-        connected = true;
-      });
-
-      peer.on('upgrade_attempt', function() {
-        write('negotiating with peer');
-      });
-
-      peer.on('busy', function () {
-        write('peer connected to someone else')
-      });
-
-      peer.on('error', function (err) {
-        write('connection error: ' + err);
-      });
-
-      peer.on('downgrade', function () {
-        write('p2p connection broken');
-        connected = false;
-      });
-
-      write('waiting for another user to go to ' + location.href);
-      input.focus();
-    </script>
+    <script src="/client.js"></script>
   </body>
 </html>

@@ -3,16 +3,25 @@ const http = require('http');
 const path = require('path');
 const url = require('url');
 
+const ecstatic = require('ecstatic');
 const SocketPeer = require('socketpeer');
 
 const host = process.env.SOCKETPEER_HOST || process.env.HOST || '0.0.0.0';
 const port = process.env.SOCKETPEER_PORT || process.env.PORT || 3000;
 const nodeEnv = process.env.NODE_ENV || 'development';
 const httpServer = http.createServer();
+const ecstaticMiddleware = ecstatic({
+  root: __dirname
+});
 const peer = new SocketPeer({
   httpServer: httpServer,
   serveLibrary: true
 });
+const staticPaths = [
+  '/',
+  '/client.js',
+  '/tachyons.min.css'
+];
 
 let pins = {};
 
@@ -44,23 +53,47 @@ function generatePinCode (length, unique) {
   return pin;
 }
 
+function redirect (res, locationUrl) {
+  res.writeHead(302, {
+    'Location': locationUrl,
+    'Content-Length': '0'
+  });
+  res.end();
+  return res;
+}
+
+function notFound (res, msg, contentType) {
+  res.writeHead(404, {
+    'Content-Type': contentType || 'text/plain'
+  });
+  res.end(msg || 'File not found');
+  return res;
+}
+
 httpServer.on('request', (req, res) => {
   const pathname = url.parse(req.url).pathname;
-  const pathnameHasPin = /\/[0-9]+$/.test(pathname);
-  if (pathname === '/' || pathnameHasPin) {
-    if (!pathnameHasPin) {
-      res.statusCode = 302;
-      res.setHeader('Location', '/' + generatePinCode());
-      res.setHeader('Content-Length', '0');
-      res.end();
-      return;
-    }
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    fs.createReadStream(path.join(__dirname, 'index.html')).pipe(res);
-  } else if (!pathname.startsWith('/socketpeer/')) {
-    res.writeHead(404, {'Content-Type': 'text/plain'});
-    res.end('File not found');
+  if (pathname.startsWith('/socketpeer/')) {
+    return;
   }
+  if (pathname.endsWith('/index.html')) {
+    return redirect(res, pathname.substr(0, '/index.html'.length - 1));
+  }
+  if (pathname.endsWith('//')) {
+    return redirect(res, pathname.replace(/\/+/, '/'));
+  }
+  if (pathname === '/') {
+    return redirect(res, '/' + generatePinCode());
+  }
+
+  const pathnameHasPin = /^\/[0-9]+$/.test(pathname);
+  if (pathnameHasPin) {
+    req.url = '/';
+  }
+  if (pathnameHasPin || staticPaths.includes(pathname)) {
+    return ecstaticMiddleware(req, res);
+  }
+
+  notFound(res);
 });
 
 if (!module.parent) {
