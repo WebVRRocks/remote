@@ -1,11 +1,11 @@
 (function () {
-  var input = document.querySelector('input')
+  var navFormEl = document.getElementById('nav-form');
 
   var logsEl = document.createElement('div');
   logsEl.id = 'logs';
   logsEl.className = 'absolute bottom-0 left-0 right-0 o-50 bg-near-black white w-100 h-20 overflow-y-auto';
 
-  var code = window.location.search.substr(1) || window.location.hash.substr(1) || window.location.pathname.substr(1);
+  var code = window.location.pathname.substr(1) || window.location.search.substr(1) || window.location.hash.substr(1);
   var big = Math.pow(16, 10);
   var connected = false;
 
@@ -24,27 +24,47 @@
   }
 
   function write (msg) {
-    logsEl.innerHTML += msg;
+    // logsEl.innerHTML += msg;
+    console.log('[debug] ' + msg);
   }
 
-  var navForm = document.getElementById('nav-form');
-  navForm.addEventListener('submit', function (evt) {
-    alert(1);
-    write('<button press> ' + input.value);
-    peer.send(input.value);
+  function directionChanged () {
+    var selectedDirectionEl = navFormEl.querySelector('input[name="direction"]:checked');
 
-    window.location.hash = '#' + input.value;
+    if (!selectedDirectionEl) {
+      return;
+    }
 
-    // input.value = '';
-    // input.focus();
+    var directionValue = selectedDirectionEl.value;
 
+    write('<button press> ' + directionValue);
+
+    peer.send(directionValue);
+
+    var stateData = {
+      type: 'buttondown',
+      value: directionValue
+    };
+
+    window.top.postMessage(JSON.stringify(stateData), '*');
+
+    window.location.hash = '#' + directionValue;
+
+    return stateData;
+  }
+
+  navFormEl.addEventListener('submit', function (evt) {
+    directionChanged();
     return false;
   });
-  navForm.addEventListener('change', function (evt) {
-    navForm.submit();
+  navFormEl.addEventListener('change', function () {
+    console.log('changed');
+    directionChanged();
+    // navForm.submit();
   });
 
   peer.on('data', function (data) {
+    window.top.postMessage(data, '*');
     write('<them> ' + data);
   });
 
@@ -71,6 +91,4 @@
   });
 
   write('waiting for another user to go to ' + location.href);
-
-  input.focus();
 })();
