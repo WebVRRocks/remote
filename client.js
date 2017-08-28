@@ -28,40 +28,43 @@
     console.log('[debug] ' + msg);
   }
 
-  function directionChanged () {
-    var selectedDirectionEl = navFormEl.querySelector('input[name="direction"]:checked');
+  function directionChanged (value) {
+    write('<button press> ' + value);
 
-    if (!selectedDirectionEl) {
-      return;
-    }
-
-    var directionValue = selectedDirectionEl.value;
-
-    write('<button press> ' + directionValue);
-
-    peer.send(directionValue);
+    peer.send(value);
 
     var stateData = {
       type: 'buttondown',
-      value: directionValue
+      value: value
     };
 
     window.top.postMessage(JSON.stringify(stateData), '*');
 
-    window.location.hash = '#' + directionValue;
+    window.location.hash = '#' + value;
 
     return stateData;
   }
 
   navFormEl.addEventListener('submit', function (evt) {
-    directionChanged();
-    return false;
+    evt.preventDefault();
+    evt.stopPropagation();
   });
-  navFormEl.addEventListener('change', function () {
-    console.log('changed');
-    directionChanged();
-    // navForm.submit();
+  navFormEl.addEventListener('mousedown', function (evt) {
+    console.log('mousedown', evt);
+    var el = evt.target.closest('button');
+    directionChanged(el.value);
   });
+  navFormEl.addEventListener('input', function (evt) {
+    console.log('input', evt);
+  });
+  navFormEl.addEventListener('change', function (evt) {
+    console.log('change', evt);
+  });
+
+  // navFormEl.addEventListener('input', function () {
+  //   console.log('changed');
+  //   directionChanged();
+  // });
 
   peer.on('data', function (data) {
     window.top.postMessage(data, '*');
