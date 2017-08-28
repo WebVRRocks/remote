@@ -1,32 +1,51 @@
 <!doctype html>
-<html>
+<html class="h-100 w-100 bg-near-black">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#111">
     <link rel="stylesheet" href="/tachyons.min.css">
     <title>Remote</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body,
+      [data-form="nav"],
+      [data-fieldset="nav"] {
+        height: 100%;
+        min-width: 100%;
+      }
+
+      .fieldset {
+        height: 100vh;
+      }
+    </style>
   </head>
-  <body>
-    <form id="nav-form" data-form="nav" action="#" method="post">
-      <fieldset class="bw0 grid" data-grid="nav">
-        <legend class="dn">Navigate</legend>
-        <label class="db w-10">
-          <button type="submit" value="up">Up</button>
+  <body class="h-100 w-100 white">
+    <form id="nav-form" data-form="nav" action="#" method="post" class="h-100 w-100 relative">
+      <fieldset class="pa0 bw0 fieldset bg-red" data-fieldset="nav">
+        <!-- <legend class="dn">Navigate</legend> -->
+        <label class="db w-100 absolute">
+          <button type="submit" value="up" class="bg-black-90 pointer bw0 db w-100 color-inherit" style="height: 33.3333vh">Up</button>
         </label>
-        <label class="db w-10">
-          <button type="submit" value="right">Right</button>
+        <label class="db absolute right-0" style="top: 33.333vh; width: 33.333vw">
+          <button type="submit" value="right" class="bg-black-90 bg-yellow pointer bw0 db w-100 color-inherit" style="height: 33.3333vh">Right</button>
         </label>
-        <label class="db w-10">
-          <button type="submit" value="down">Down</button>
+        <label class="db w-100 absolute bottom-0">
+          <button type="submit" value="down" class="bg-black-90 pointer bw0 db w-100 color-inherit" style="height: 33.3333vh">Down</button>
         </label>
-        <label class="db w-10">
-          <button type="submit" value="left">Left</button>
+        <label class="db absolute" style="top: 33.3333vh; width: 33.333vw">
+          <button type="submit" value="left" class="bg-black-90 bg-red pointer bw0 db w-100 color-inherit" style="height: 33.3333vh">Left</button>
         </label>
-        <label class="db w-10">
-          <button type="submit" value="select" autofocus>Select</button>
+        <label class="db absolute" style="top: 33.3333vh; left: 50%; left: calc(50% - 33.3333vw / 2); width: 33.333vw">
+          <button type="submit" value="select" class="bg-black-90 pointer bw0 db w-100 color-inherit" style="height: 33.3333vh" autofocus>Select</button>
         </label>
-        <label class="db w-10">
+        <label class="db w-10 dn">
           <button type="submit" value="back">Back</button>
         </label>
       </fieldset>
