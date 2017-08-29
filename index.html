@@ -1,108 +1,105 @@
 <!doctype html>
-<html>
+<html class="bg-near-black h-100">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#111">
+    <link rel="stylesheet" href="/tachyons.min.css">
+    <title>Remote</title>
     <style>
       * {
         box-sizing: border-box;
-      }
-      html, body {
-        height: 100%;
         margin: 0;
+        padding: 0;
       }
-      body {
-        padding: .5em;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
+
+      .f0 {
+        font-size: 0;
       }
-      pre {
-        flex: 1;
-        overflow: auto;
-        white-space: pre-wrap;
+
+      [data-fieldset="nav"] {
+        min-height: 100vh;
+        width: 100vw;
       }
-      input, pre {
-        font: normal 20px monospace;
-        padding: .3em;
+
+      .nav-group {
+        display: grid;
+        grid-gap: 10px;
+        grid-template-rows: 150px auto 100px;
+      }
+
+      .fieldset label[data-direction="up"] {
+        grid-column: 1 / span 3;
+        z-index: 2;
+      }
+
+      .fieldset label[data-direction="left"] {
+        grid-column: 1;
+        grid-row: 2 / span 3;
+      }
+
+      .fieldset label[data-direction="right"] {
+        grid-column: 3;
+        grid-row: 2 / span 3;
+        z-index: 2;
+      }
+
+      .fieldset label[data-direction="select"] {
+        grid-row: 2 / span 2;
+      }
+
+      .fieldset label[data-direction="down"] {
+        grid-column: 2 / span 1;
       }
     </style>
   </head>
-  <body>
-    <pre>
-<strong>SocketPeer</strong> test app
-<a href="https://github.com/potch/test-socketpeer">project on GitHub</a>
-    </pre>
-    <input placeholder="message" autofocus autocomplete="off">
+  <body class="h-100 white">
+    <form id="nav-form" data-form="nav" action="#" method="post" class="h-100">
+      <fieldset data-fieldset="nav" class="pa0 bw0 fieldset h-100 w-100 bg-near-black">
+        <div class="nav-group h-100 w-100 relative">
+          <legend class="dn">Navigate</legend>
+          <label data-direction="up">
+            <button type="submit" value="up" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit bg-purple">
+              <span>
+                Up
+              </span>
+            </button>
+          </label>
+          <label data-direction="left">
+            <button type="submit" value="left" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit bg-red">
+              <span>
+                Left
+              </span>
+            </button>
+          </label>
+          <label data-direction="select">
+            <button type="submit" value="select" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit bg-pink">
+              <span>
+                Select
+              </span>
+            </button>
+          </label>
+          <label data-direction="right">
+            <button type="submit" value="right" class="bg-black-90 pointer bg-pink bw0 db h-100 w-100 color-inherit bg-green">
+              <span>
+                Right
+              </span>
+            </button>
+          </label>
+          <label data-direction="down">
+            <button type="submit" value="down" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit bg-blue">
+              <span>
+                Down
+              </span>
+            </button>
+          </label>
+          <label data-direction="back" class="w-10 dn">
+            <button type="submit" value="back">Back</button>
+          </label>
+        </div>
+      </fieldset>
+    </form>
     <script src="/socketpeer/socketpeer.js"></script>
-    <script>
-      var code = window.location.search.substr(1) || window.location.hash.substr(1) || window.location.pathname.substr(1);
-      var big = Math.pow(16, 10);
-      var connected = false;
-
-      if (!code) {
-        code = ((Math.random() * big | 0) + big).toString(16);
-        history.replaceState(null, null, '/' + code);
-      }
-
-      var peer = new SocketPeer({
-        pairCode: code,
-        url: location.origin + '/socketpeer/'
-      });
-
-      function pad(n) {
-        return ('0' + n).substr(-2);
-      }
-
-      var out = document.querySelector('pre');
-      function write(msg) {
-        var d = new Date();
-        var stamp = [d.getHours(), d.getMinutes(), d.getSeconds()].map(pad).join(':');
-        var row = document.createElement('div');
-        row.appendChild(document.createTextNode('[' + stamp + '] ' + msg))
-        out.appendChild(row);
-        out.scrollTop = out.scrollHeight;
-      }
-
-      var input = document.querySelector('input');
-      input.addEventListener('keypress', function (e) {
-        if (e.keyCode === 13 && connected) {
-          e.preventDefault();
-          write('<you> ' + input.value);
-          peer.send(input.value);
-          input.value = '';
-          input.focus();
-        }
-      });
-
-      peer.on('data', function (data) {
-        write('<them> ' + data);
-      });
-
-      peer.on('upgrade', function() {
-        write('upgraded to p2p');
-        connected = true;
-      });
-
-      peer.on('upgrade_attempt', function() {
-        write('negotiating with peer');
-      });
-
-      peer.on('busy', function () {
-        write('peer connected to someone else')
-      });
-
-      peer.on('error', function (err) {
-        write('connection error: ' + err);
-      });
-
-      peer.on('downgrade', function () {
-        write('p2p connection broken');
-        connected = false;
-      });
-
-      write('waiting for another user to go to ' + location.href);
-      input.focus();
-    </script>
+    <script src="/client.js"></script>
   </body>
 </html>

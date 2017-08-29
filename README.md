@@ -1,8 +1,12 @@
-# test-socketpeer
+# remote
 
-This is a simple peer-to-peer chat app built as example code for [SocketPeer](https://github.com/cvan/socketpeer/blob/master/server/index.js).
+A mobile-centric remote control for navigating WebXR content.
 
-## Run this Project
+The realtime code (WebRTC + WebSockets) is powered by the [SocketPeer](https://github.com/cvan/socketpeer/blob/master/server/index.js) library.
+
+
+## Development
+
 ```sh
 npm install
 npm start
