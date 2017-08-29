@@ -50,8 +50,11 @@
     evt.stopPropagation();
   });
   navFormEl.addEventListener('mousedown', function (evt) {
-    console.log('mousedown', evt);
     var el = evt.target.closest('button');
+    if (!el) {
+      return;
+    }
+    console.log('mousedown', evt);
     directionChanged(el.value);
   });
   navFormEl.addEventListener('input', function (evt) {

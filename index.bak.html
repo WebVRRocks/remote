@@ -1,0 +1,120 @@
+<!doctype html>
+<html class="bg-near-black">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#111">
+    <link rel="stylesheet" href="/tachyons.min.css">
+    <title>Remote</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      .fieldset {
+        align-content: stretch;
+        align-items: stretch;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        width: 2000px;
+      }
+
+      .fieldset > label {
+        background: red;
+        display: flex;
+        flex-basis: 0;
+        flex-grow: 0;
+        flex-shrink: 0;
+        height: 250px;
+        width: 300px;
+      }
+
+      .fieldset > label[data-direction="up"] {
+        /*background: cyan;*/
+        /*height: 200px;*/
+        /*width: 100%;*/
+      }
+
+      .fieldset > label[data-direction="left"] {
+        /*height: 500px;*/
+      }
+
+      .fieldset > label[data-direction="right"] {
+        /*height: 500px;*/
+      }
+
+      .fieldset > label[data-direction="down"] {
+        /*width: 300px;*/
+        /*height: 500px;*/
+      }
+
+      .fieldset > label[data-direction="left"],
+      .fieldset > label[data-direction="select"],
+      .fieldset > label[data-direction="right"] {
+        /*width: 300px;*/
+      }
+    </style>
+  </head>
+  <body class="white">
+    <form id="nav-form" data-form="nav" action="#" method="post">
+      <fieldset data-fieldset="nav" class="pa0 bw0 fieldset w-100 bg-yellow">
+        <!-- <legend class="dn">Navigate</legend> -->
+        <label data-direction="up" class="">
+          up
+          <!--
+          <button type="submit" value="up" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit bg-gray">
+            <span>
+              Up
+            </span>
+          </button>
+          -->
+        </label>
+        <label data-direction="left" class="bg-black">
+          left
+          <!--
+          <button type="submit" value="left" class="bg-black-90 pointer bw0 db h-100 color-inherit bg-red">
+            <span>
+              Left
+            </span>
+          </button>
+          -->
+        </label>
+        <label data-direction="select" class="">
+          select
+          <!--
+          <button type="submit" value="select" class="bg-black-90 bg-green pointer bw0 db h-100 color-inherit">
+            <span>
+              Select
+            </span>
+          </button>
+          -->
+        </label>
+        <!--
+        <label data-direction="right" class="">
+          <button type="submit" value="right" class="bg-black-90 bg-pink bw0 db h-100 color-inherit">
+            <span>
+              Right
+            </span>
+          </button>
+        </label>
+        <label data-direction="down" class="">
+          <button type="submit" value="down" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit">
+            <span>
+              Down
+            </span>
+          </button>
+        </label>
+        <label data-direction="back" class="w-10 dn">
+          <button type="submit" value="back">Back</button>
+        </label>
+        -->
+      </fieldset>
+    </form>
+    <script src="/socketpeer/socketpeer.js"></script>
+    <script src="/client.js"></script>
+  </body>
+</html>

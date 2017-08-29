@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="h-100 w-100 bg-near-black overflow-hidden">
+<html class="bg-near-black h-100">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,32 +12,91 @@
         margin: 0;
         padding: 0;
       }
+
+      .f0 {
+        font-size: 0;
+      }
+
+      [data-fieldset="nav"] {
+        min-height: 100vh;
+        width: 100vw;
+      }
+
+      .nav-group {
+        display: grid;
+        grid-gap: 10px;
+        grid-template-rows: 150px auto 100px;
+      }
+
+      .fieldset label[data-direction="up"] {
+        grid-column: 1 / span 3;
+        z-index: 2;
+      }
+
+      .fieldset label[data-direction="left"] {
+        grid-column: 1;
+        grid-row: 2 / span 3;
+      }
+
+      .fieldset label[data-direction="right"] {
+        grid-column: 3;
+        grid-row: 2 / span 3;
+        z-index: 2;
+      }
+
+      .fieldset label[data-direction="select"] {
+        grid-row: 2 / span 2;
+      }
+
+      .fieldset label[data-direction="down"] {
+        grid-column: 2 / span 1;
+      }
     </style>
   </head>
-  <body class="h-100 w-100 white overflow-hidden">
-    <form id="nav-form" data-form="nav" action="#" method="post" class="h-100 w-100 relative">
-      <fieldset class="pa0 bw0 fieldset bg-red h-100" data-fieldset="nav">
-        <!-- <legend class="dn">Navigate</legend> -->
-        <label class="db w-100 absolute">
-          <button type="submit" value="up" class="bg-black-90 pointer bw0 db w-100 color-inherit bg-red" style="height: 33.3333vh">Up</button>
-        </label>
-        <label class="db absolute right-0 z-1" style="top: 33.333vh; width: 33.333vw">
-          <button type="submit" value="right" class="bg-black-90 bg-yellow pointer bw0 db w-100 color-inherit" style="height: 66.6666vh">Right</button>
-        </label>
-        <label class="db w-100 absolute bottom-0 z-1">
-          <button type="submit" value="down" class="bg-black-90 pointer bw0 db w-100 color-inherit" style="height: 33.3333vh">Down</button>
-        </label>
-        <label class="db absolute z-1" style="top: 33.3333vh; width: 33.333vw">
-          <button type="submit" value="left" class="relative bg-black-90 bg-orange bg-red pointer bw0 db w-100 color-inherit" style="height: 66.6666vh">
-            <span class="db absolute top-0 w-100" style="line-height: 33.3333vh; background-color: pink;">Left</span>
-          </button>
-        </label>
-        <label class="db absolute" style="top: 33.3333vh; left: 50%; left: calc(50% - 33.3333vw / 2); width: 33.333vw">
-          <button type="submit" value="select" class="bg-black-90 bg-green pointer bw0 db w-100 color-inherit" style="height: 33.3333vh" autofocus>Select</button>
-        </label>
-        <label class="db w-10 dn">
-          <button type="submit" value="back">Back</button>
-        </label>
+  <body class="h-100 white">
+    <form id="nav-form" data-form="nav" action="#" method="post" class="h-100">
+      <fieldset data-fieldset="nav" class="pa0 bw0 fieldset h-100 w-100 bg-near-black">
+        <div class="nav-group h-100 w-100 relative">
+          <legend class="dn">Navigate</legend>
+          <label data-direction="up">
+            <button type="submit" value="up" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit bg-purple">
+              <span>
+                Up
+              </span>
+            </button>
+          </label>
+          <label data-direction="left">
+            <button type="submit" value="left" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit bg-red">
+              <span>
+                Left
+              </span>
+            </button>
+          </label>
+          <label data-direction="select">
+            <button type="submit" value="select" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit bg-pink">
+              <span>
+                Select
+              </span>
+            </button>
+          </label>
+          <label data-direction="right">
+            <button type="submit" value="right" class="bg-black-90 pointer bg-pink bw0 db h-100 w-100 color-inherit bg-green">
+              <span>
+                Right
+              </span>
+            </button>
+          </label>
+          <label data-direction="down">
+            <button type="submit" value="down" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit bg-blue">
+              <span>
+                Down
+              </span>
+            </button>
+          </label>
+          <label data-direction="back" class="w-10 dn">
+            <button type="submit" value="back">Back</button>
+          </label>
+        </div>
       </fieldset>
     </form>
     <script src="/socketpeer/socketpeer.js"></script>
