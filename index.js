@@ -124,6 +124,22 @@ httpServer.on('request', (req, res) => {
     const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
     const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
+    if (!twilioAccountSid || !twilioAuthToken || !twilioPhoneNumber) {
+      let twilioErr;
+      if (!twilioAccountSid) {
+        twilioErr = new Error('Expected environment variable `TWILIO_ACCOUNT_SID` to be set (ask @cvan)');
+      }
+      if (!twilioAuthToken) {
+        twilioErr = new Error('Expected environment variable `TWILIO_AUTH_TOKEN` to be set (ask @cvan)');
+      }
+      if (!twilioPhoneNumber) {
+        twilioErr = new Error('Expected environment variable `TWILIO_PHONE_NUMBER` to be set (ask @cvan)');
+      }
+      console.warn(twilioErr);
+      jsonBody(res, {error: {message: twilioErr.message || 'Unknown error'}}, 400);
+      return;
+    }
+
     const twilioClient = new twilio(twilioAccountSid, twilioAuthToken);
 
     parser(req, res, next);
