@@ -102,6 +102,17 @@ httpServer.on('request', (req, res) => {
   if (pathname === '/sms/') {
     return redirect(res, '/sms');
   }
+
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Access-Control-Request-Method, Access-Control-Request-Headers, Origin, Accept, Authorization, X-Requested-With, Content-Type');
+  if (req.method === 'OPTIONS') {
+    res.writeHead(200);
+    res.end();
+    return;
+  }
+
   if (pathname === '/sms') {
     const contentType = req.headers['content-type'] || '';
     const parser = contentType.includes('json') ? bodyParser.json() : bodyParser.urlencoded({extended: false});
@@ -140,7 +151,8 @@ httpServer.on('request', (req, res) => {
       }).then(msg => {
         jsonBody(res, {success: true, sid: msg.sid}, 200);
       }).catch(err => {
-        jsonBody(res, {error: false, err: err.message || 'Unknown error'}, 400);
+        console.warn(err);
+        jsonBody(res, {error: {message: err.message || 'Unknown error'}}, 400);
       });
     }
 
