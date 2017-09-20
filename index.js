@@ -82,6 +82,21 @@ function notFound (res, msg, contentType) {
   return res;
 }
 
+/**
+ * Parse phone numbers as strings to format accepted by Twilio.
+ *
+ * Examples:
+ *
+ *   +1 (650) 555-1212  =>  +16505551212
+ *   6505551212         =>  6505551212
+ *   650 555 1212       =>  6505551212
+ *   650.555.1212       =>  6505551212
+ *
+ */
+function parsePhoneNumber (str) {
+  return str.replace(/[^0-9\+]/g, '');
+}
+
 httpServer.on('request', (req, res) => {
   const urlParsed = url.parse(req.url);
   const pathname = urlParsed.pathname;
@@ -146,13 +161,17 @@ httpServer.on('request', (req, res) => {
 
     function next () {
       const smsBody = req.body.body;
-      const smsTo = req.body.to;
+      let smsTo = req.body.to;
       return new Promise((resolve, reject) => {
         if (!smsBody) {
           throw new Error('Value missing for `body` field (e.g., `Check this out!`)');
         }
         if (!smsTo) {
           throw new Error('Value missing for `to` field (e.g., `+16505551212`)');
+        }
+        smsTo = parsePhoneNumber(smsTo);
+        if (!smsTo) {
+          throw new Error('Unexpected value for `to` field (e.g., `+16505551212`)');
         }
         return twilioClient.messages.create({
           body: smsBody,
