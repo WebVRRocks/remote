@@ -23,6 +23,8 @@ const peer = new SocketPeer({
 });
 const staticPaths = [
   '/',
+  '/arrow.svg',
+  '/box.svg',
   '/client.js',
   '/tachyons.min.css'
 ];

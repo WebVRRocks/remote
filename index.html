@@ -28,27 +28,61 @@
         grid-template-rows: 150px auto 100px;
       }
 
-      .fieldset label[data-direction="up"] {
+      /* Source image: https://thenounproject.com/term/down/268252/ */
+      label[data-direction] span {
+        background: url(arrow.svg) 50% 50% no-repeat;
+        background-size: contain;
+        display: inline-block;
+        filter: invert(1);
+        overflow: hidden;
+        text-indent: -200%;
+        white-space: nowrap;
+        height: calc(5rem + 2vw + 1vh);
+        width: calc(5rem + 2vw + 1vh);
+      }
+
+      label[data-direction] button:focus {
+        filter: hue-rotate(90deg);
+        /*filter: hue-rotate(320deg);*/
+      }
+
+      label[data-direction="select"] span {
+        background-image: url(box.svg);
+      }
+
+      label[data-direction="up"] span {
+        transform: rotate(180deg);
+      }
+
+      label[data-direction="left"] span {
+        transform: rotate(90deg);
+      }
+
+      label[data-direction="right"] span {
+        transform: rotate(-90deg);
+      }
+
+      label[data-direction="up"] {
         grid-column: 1 / span 3;
         z-index: 2;
       }
 
-      .fieldset label[data-direction="left"] {
+      label[data-direction="left"] {
         grid-column: 1;
         grid-row: 2 / span 3;
       }
 
-      .fieldset label[data-direction="right"] {
+      label[data-direction="right"] {
         grid-column: 3;
         grid-row: 2 / span 3;
         z-index: 2;
       }
 
-      .fieldset label[data-direction="select"] {
+      label[data-direction="select"] {
         grid-row: 2 / span 2;
       }
 
-      .fieldset label[data-direction="down"] {
+      label[data-direction="down"] {
         grid-column: 2 / span 1;
       }
     </style>
@@ -59,35 +93,35 @@
         <div class="nav-group h-100 w-100 relative">
           <legend class="dn">Navigate</legend>
           <label data-direction="up">
-            <button type="submit" value="up" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit bg-purple">
+            <button type="submit" value="up" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit -bg-purple">
               <span>
                 Up
               </span>
             </button>
           </label>
           <label data-direction="left">
-            <button type="submit" value="left" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit bg-red">
+            <button type="submit" value="left" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit -bg-red">
               <span>
                 Left
               </span>
             </button>
           </label>
           <label data-direction="select">
-            <button type="submit" value="select" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit bg-pink">
+            <button type="submit" value="select" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit -bg-pink">
               <span>
                 Select
               </span>
             </button>
           </label>
           <label data-direction="right">
-            <button type="submit" value="right" class="bg-black-90 pointer bg-pink bw0 db h-100 w-100 color-inherit bg-green">
+            <button type="submit" value="right" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit -bg-green">
               <span>
                 Right
               </span>
             </button>
           </label>
           <label data-direction="down">
-            <button type="submit" value="down" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit bg-blue">
+            <button type="submit" value="down" class="bg-black-90 pointer bw0 db h-100 w-100 color-inherit -bg-blue">
               <span>
                 Down
               </span>
