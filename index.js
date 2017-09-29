@@ -10,16 +10,26 @@ const ecstatic = require('ecstatic');
 const SocketPeer = require('socketpeer');
 const twilio = require('twilio');
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Credentials': 'true',
+  'Access-Control-Allow-Methods': 'GET,HEAD,OPTIONS,POST,PUT',
+  'Access-Control-Allow-Headers': 'Access-Control-Allow-Headers, Access-Control-Request-Method, Access-Control-Request-Headers, Origin, Accept, Authorization, X-Requested-With, Content-Type',
+  'Access-Control-Expose-Headers': 'Location'
+};
+
 const host = process.env.SOCKETPEER_HOST || process.env.HOST || '0.0.0.0';
 const port = process.env.SOCKETPEER_PORT || process.env.PORT || 3000;
 const nodeEnv = process.env.NODE_ENV || 'development';
 const httpServer = http.createServer();
 const ecstaticMiddleware = ecstatic({
-  root: __dirname
+  root: __dirname,
+  headers: corsHeaders
 });
 const peer = new SocketPeer({
   httpServer: httpServer,
-  serveLibrary: true
+  serveLibrary: true,
+  headers: corsHeaders
 });
 const staticPaths = [
   '/',
@@ -59,7 +69,12 @@ function generatePinCode (length, unique) {
   return pin;
 }
 
-function redirect (res, locationUrl) {
+function redirect (req, res, locationUrl) {
+  var corsHandled = cors(req, res);
+  if (!corsHandled) {
+    return;
+  }
+
   res.writeHead(302, {
     'Location': locationUrl,
     'Content-Length': '0'
@@ -68,7 +83,12 @@ function redirect (res, locationUrl) {
   return res;
 }
 
-function jsonBody (res, data, statusCode, contentType) {
+function jsonBody (req, res, data, statusCode, contentType) {
+  var corsHandled = cors(req, res);
+  if (!corsHandled) {
+    return;
+  }
+
   res.writeHead(statusCode || 200, {
     'Content-Type': contentType || 'application/json'
   });
@@ -76,7 +96,12 @@ function jsonBody (res, data, statusCode, contentType) {
   return res;
 }
 
-function notFound (res, msg, contentType) {
+function notFound (req, res, msg, contentType) {
+  var corsHandled = cors(req, res);
+  if (!corsHandled) {
+    return;
+  }
+
   res.writeHead(404, {
     'Content-Type': contentType || 'text/plain'
   });
@@ -99,37 +124,38 @@ function parsePhoneNumber (str) {
   return str.replace(/[^0-9\+]/g, '');
 }
 
+function cors (req, res) {
+  Object.keys(corsHeaders).forEach(header => {
+    res.setHeader(header, corsHeaders[header]);
+  });
+  if (req.method === 'OPTIONS') {
+    res.writeHead(200);
+    res.end();
+    return false;
+  }
+  return true;
+}
+
 httpServer.on('request', (req, res) => {
   const urlParsed = url.parse(req.url);
   const pathname = urlParsed.pathname;
   const qs = urlParsed.qs;
+
   if (pathname.startsWith('/socketpeer/')) {
     return;
   }
   if (pathname.endsWith('/index.html')) {
-    return redirect(res, pathname.substr(0, '/index.html'.length - 1));
+    return redirect(req, res, pathname.substr(0, '/index.html'.length - 1));
   }
   if (pathname.endsWith('//')) {
-    return redirect(res, pathname.replace(/\/+/g, '/'));
+    return redirect(req, res, pathname.replace(/\/+/g, '/'));
   }
   if (pathname === '/') {
-    return redirect(res, '/' + generatePinCode());
+    return redirect(req, res, '/' + generatePinCode());
   }
-
   if (pathname === '/sms/') {
-    return redirect(res, '/sms');
+    return redirect(req, res, '/sms');
   }
-
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Access-Control-Request-Method, Access-Control-Request-Headers, Origin, Accept, Authorization, X-Requested-With, Content-Type');
-  if (req.method === 'OPTIONS') {
-    res.writeHead(200);
-    res.end();
-    return;
-  }
-
   if (pathname === '/sms') {
     const contentType = req.headers['content-type'] || '';
     const parser = contentType.includes('json') ? bodyParser.json() : bodyParser.urlencoded({extended: false});
@@ -153,7 +179,7 @@ httpServer.on('request', (req, res) => {
         twilioErr = new Error('Expected environment variable `TWILIO_PHONE_NUMBER` to be set (ask @cvan)');
       }
       console.warn(twilioErr);
-      jsonBody(res, {error: {message: twilioErr.message || 'Unknown error'}}, 400);
+      jsonBody(req, res, {error: {message: twilioErr.message || 'Unknown error'}}, 400);
       return;
     }
 
@@ -186,10 +212,10 @@ httpServer.on('request', (req, res) => {
           resolve(msg);
         });
       }).then(msg => {
-        jsonBody(res, {success: true, sid: msg.sid}, 200);
+        jsonBody(req, res, {success: true, sid: msg.sid}, 200);
       }).catch(err => {
         console.warn(err);
-        jsonBody(res, {error: {message: err.message || 'Unknown error'}}, 400);
+        jsonBody(req, res, {error: {message: err.message || 'Unknown error'}}, 400);
       });
     }
 
@@ -204,7 +230,7 @@ httpServer.on('request', (req, res) => {
     return ecstaticMiddleware(req, res);
   }
 
-  notFound(res);
+  notFound(req, res);
 });
 
 if (!module.parent) {
