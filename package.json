@@ -18,7 +18,7 @@
     "body-parser": "^1.17.2",
     "dotenv": "^4.0.0",
     "ecstatic": "^2.2.1",
-    "socketpeer": "^1.0.1",
+    "socketpeer": "github:cvan/socketpeer#569d540",
     "twilio": "^3.6.4"
   },
   "devDependencies": {
