@@ -31,18 +31,18 @@
   function directionChanged (value) {
     write('<button press> ' + value);
 
-    peer.send(value);
-
-    var stateData = {
-      type: 'buttondown',
+    var peerMsg = {
+      action: 'move',
       value: value
     };
 
-    window.top.postMessage(JSON.stringify(stateData), '*');
+    peer.send(peerMsg);
+
+    window.top.postMessage(JSON.stringify(peerMsg), '*');
 
     window.location.hash = '#' + value;
 
-    return stateData;
+    return peerMsg;
   }
 
   navFormEl.addEventListener('submit', function (evt) {
@@ -63,11 +63,6 @@
   navFormEl.addEventListener('change', function (evt) {
     console.log('change', evt);
   });
-
-  // navFormEl.addEventListener('input', function () {
-  //   console.log('changed');
-  //   directionChanged();
-  // });
 
   peer.on('data', function (data) {
     window.top.postMessage(data, '*');
