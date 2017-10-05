@@ -2,4 +2,6 @@
 .env
 *.log
 *.rdb
+/log*.txt
+/logs/
 node_modules
