@@ -7,6 +7,10 @@ The realtime code (WebRTC + WebSockets) is powered by the [SocketPeer](https://g
 
 ## Development
 
+brew install redis  # macOS
+
+Install the Node dependencies:
+
 ```sh
 npm install
 npm start

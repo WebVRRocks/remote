@@ -5,12 +5,14 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run dev",
-    "dev": "nodemon index.js",
-    "prod": "node index.js",
+    "dev": "nodemon server/index.js --ignore config.json",
+    "prod": "node server/index.js",
+    "predev": "npm run create_logs_dir",
+    "preprod": "npm run create_logs_dir",
+    "create_logs_dir": "shx mkdir -p logs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": [
-    "Matthew Claypotch <me@potch.me>",
     "WebVR Rocks authors"
   ],
   "license": "CC0-1.0",
@@ -18,7 +20,14 @@
     "body-parser": "^1.17.2",
     "dotenv": "^4.0.0",
     "ecstatic": "^2.2.1",
+    "express": "^4.16.1",
+    "express-pouchdb": "^2.3.7",
+    "pouchdb": "^6.3.4",
+    "pouchdb-server": "^2.3.7",
+    "redisdown": "^0.1.12",
+    "shx": "^0.2.2",
     "socketpeer": "github:cvan/socketpeer#569d540",
+    "trailing-slash": "^2.0.0",
     "twilio": "^3.6.4"
   },
   "devDependencies": {
