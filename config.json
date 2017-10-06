@@ -1,8 +1,8 @@
 {
   "couchdb": {
-    "uuid": "8d26a69f-2c1d-408c-9d0d-5f16e60fceac",
-    "log": {
-      "file": "logs/log.txt"
-    }
+    "uuid": "8d26a69f-2c1d-408c-9d0d-5f16e60fceac"
+  },
+  "log": {
+    "file": "logs/log.txt"
   }
 }

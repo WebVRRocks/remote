@@ -3,8 +3,11 @@ const http = require('http');
 const path = require('path');
 const url = require('url');
 
-const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
+dotenv.config({path: path.join(__dirname, '..')});
+dotenv.load();
+
+const bodyParser = require('body-parser');
 const ecstatic = require('ecstatic');
 const express = require('express');
 const expressPouchDB = require('express-pouchdb');
@@ -13,10 +16,6 @@ const resisdown = require('redisdown');
 const SocketPeer = require('socketpeer');
 const trailingSlash = require('trailing-slash');
 const twilio = require('twilio');
-
-dotenv.config({
-  path: path.join(__dirname, '..')
-});
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -27,17 +26,16 @@ const corsHeaders = {
 };
 
 const host = process.env.SOCKETPEER_HOST || process.env.HOST || '0.0.0.0';
-const port = process.env.SOCKETPEER_PORT || process.env.PORT || 3000;
+const port = parseFloat(process.env.SOCKETPEER_PORT || process.env.PORT || '3000');
 const nodeEnv = process.env.NODE_ENV || 'development';
 
 const app = express();
 
-app.use(trailingSlash({slash: true});
-
 const httpServer = http.createServer(app);
 const ecstaticMiddleware = ecstatic({
-  root: __dirname,
-  headers: corsHeaders
+  root: path.join(__dirname, '..', 'client'),
+  headers: corsHeaders,
+  showdir: false
 });
 const peer = new SocketPeer({
   httpServer: httpServer,
@@ -63,15 +61,15 @@ function generatePinCode (length, unique) {
     unique = true;
   }
 
-  var pinDigits = [];
-  for (var idx = 0; idx < length; idx++) {
+  let pinDigits = [];
+  for (let idx = 0; idx < length; idx++) {
     pinDigits.push(Math.floor(Math.random() * 10));
   }
 
-  var pin = pinDigits.join('');
+  const pin = pinDigits.join('');
 
   if (unique && pin in pins) {
-    return generatePINCode();
+    return generatePinCode();
   }
 
   if (typeof pins[pin] !== 'number') {
@@ -83,7 +81,7 @@ function generatePinCode (length, unique) {
 }
 
 function redirect (req, res, locationUrl) {
-  var corsHandled = cors(req, res);
+  const corsHandled = cors(req, res);
   if (!corsHandled) {
     return;
   }
@@ -97,7 +95,7 @@ function redirect (req, res, locationUrl) {
 }
 
 function jsonBody (req, res, data, statusCode, contentType) {
-  var corsHandled = cors(req, res);
+  const corsHandled = cors(req, res);
   if (!corsHandled) {
     return;
   }
@@ -110,7 +108,7 @@ function jsonBody (req, res, data, statusCode, contentType) {
 }
 
 function notFound (req, res, msg, contentType) {
-  var corsHandled = cors(req, res);
+  const corsHandled = cors(req, res);
   if (!corsHandled) {
     return;
   }
@@ -168,6 +166,8 @@ function sms (req, res) {
   const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
   const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
+  console.log(process.env);
+
   if (!twilioAccountSid || !twilioAuthToken || !twilioPhoneNumber) {
     let twilioErr;
     if (!twilioAccountSid) {
@@ -221,48 +221,62 @@ function sms (req, res) {
   }
 }
 
-httpServer.on('request', (req, res) => {
-  const urlParsed = url.parse(req.url);
-  const pathname = urlParsed.pathname;
-  const qs = urlParsed.qs;
+const redisdownPouchDB = PouchDB.defaults({db: resisdown, url: process.env.REDIS_URL});
 
-  if (pathname.startsWith('/socketpeer/')) {
+app.use('/db/', expressPouchDB(redisdownPouchDB));
+
+app.use((req, res, next) => {
+  if (req.path.startsWith('/socketpeer/')) {
     return;
   }
-  if (pathname.endsWith('/index.html')) {
-    return redirect(req, res, pathname.substr(0, '/index.html'.length - 1));
-  }
-  if (pathname.endsWith('//')) {
-    return redirect(req, res, pathname.replace(/\/+/g, '/'));
-  }
-  if (pathname === '/') {
+
+  const pathnameClean = req.path.replace(/\/+$/g, '/').replace(/\/$/, '') || '/';
+
+  if (pathnameClean === '/') {
     return redirect(req, res, '/' + generatePinCode());
   }
-  if (pathname === '/sms') {
-    return sms(req, res);
+
+  if (req.path !== pathnameClean) {
+    return redirect(req, res, pathnameClean);
   }
 
-  const pathnameHasPin = /^\/[0-9]+$/.test(pathname);
+  trailingSlash({slash: false})(req, res, next);
+});
+
+app.all('*/index.html$', (req, res, next) => {
+  const parsedUrl = url.parse(req.originalUrl);
+
+  parsedUrl.pathname = req.path.replace(/\/index.html$/, '') || '/';
+
+  const redirectUrl = url.format(parsedUrl);
+
+  redirect(req, res, redirectUrl);
+});
+
+app.post('/sms', (req, res, next) => {
+  sms(req, res);
+});
+
+app.use((req, res, next) => {
+  if (req.path.startsWith('/socketpeer/')) {
+    return;
+  }
+
+  const pathnameHasPin = /^\/[0-9]+$/.test(req.path);
   if (pathnameHasPin) {
-    console.log('pathnameHasPin', pathnameHasPin);
     req.url = '/';
-  }
-  if (pathnameHasPin || staticPaths.includes(pathname)) {
-    console.log('ECSTATIC', pathnameHasPin, staticPaths.includes(pathname));
-    return ecstaticMiddleware(req, res);
+    return ecstaticMiddleware(req, res, next);
   }
 
-  console.log('not found');
+  if (staticPaths.includes(req.path)) {
+    return ecstaticMiddleware(req, res, next);
+  }
 
   notFound(req, res);
 });
 
 if (!module.parent) {
-  const redisdownPouchDB = PouchDB.defaults({db: resisdown});
-
-  app.use('/db', expressPouchDB(redisdownPouchDB));
-
-  httpServer.listen(port, host, () => {
+  app.listen(port, host, () => {
     console.log('[%s] Server listening on %s:%s', nodeEnv, host, port);
   });
 }

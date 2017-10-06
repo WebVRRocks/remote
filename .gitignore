@@ -3,5 +3,5 @@
 *.log
 *.rdb
 /log*.txt
-/logs/
+/logs
 node_modules
